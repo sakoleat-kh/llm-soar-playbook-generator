@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, UTC
 from pydantic import BaseModel
-from app.routers.webhook import AlertInput
+from app.services.sigma import AlertInput
 
 class NormalisedAlert(BaseModel):
     sender: str
