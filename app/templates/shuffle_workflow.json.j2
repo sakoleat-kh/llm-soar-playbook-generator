@@ -1,0 +1,39 @@
+{
+"name": "{{ workflow_name }}",
+"description": "{{ alert_desciption }}",
+"start": "{{ start_node }}",
+
+"actions": [
+{% for step in step %}
+{
+"id": "{{ step.id }}",
+"label": "{{ step.step_name }}",
+"name": "{{ step.action }}",
+"app_name": "{{ step.app_name }}",
+"app_version": "{{ step.app_version }}",
+"position": {
+"x": {{ step.x }},
+"y": {{ step.y }}
+},
+"parameters": {{ step.parameters | tojson }}
+}{% if not loop.last %},{% endif %}
+{% endfor %}
+],
+
+"branches": [],
+
+"triggers": [],
+
+"configuration": {
+"exit_on_error": false,
+"start_from_top": false,
+"skip_notifications": false
+},
+
+"workflow_variables": [
+{
+"technique_id": "{{ technique_id }}",
+"technique_name": "{{ technique_name }}"
+}
+]
+}
