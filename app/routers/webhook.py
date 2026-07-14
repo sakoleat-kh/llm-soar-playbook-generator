@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from app.models.database import get_db
 from app.models.alert import Alert
 from app.services.normaliser import normalise_alert
@@ -41,3 +44,37 @@ async def recive_webhook(
         "alert_id": db_alert.id
     }
     
+@router.get("/alerts")
+def list_alerts(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db)
+):
+    limit = min(limit, 100)
+
+    alerts = (
+        db.query(Alert)
+        .order_by(Alert.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return alerts
+
+@router.get("/alerts/{alert_id}")
+def get_alert(
+    alert_id: str,
+    db: Session = Depends(get_db),
+):
+    alert = (
+        db.query(Alert)
+        .filter(Alert.id == alert_id)
+        .first()
+    )
+
+    if alert is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Alert not found",
+        )
+    return alert
