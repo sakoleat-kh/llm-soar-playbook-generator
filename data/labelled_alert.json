@@ -1,0 +1,302 @@
+[
+    {
+        "id": 1,
+        "text":"An employee received an email with an attached invoice document that requested macros to be enabled before viewing.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 2,
+        "text": "A finance user opened a password-protected archive received by email containing a malicious spreadsheet",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 3,
+        "text": "Multiple users reported a payroll-themed email carring a document that launched suspicious processes after opening.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 4,
+        "text": "An HR employee received a resume attachment that executed an unexpected command after being opend.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 5,
+        "text": "A compressed attachment deliverd through email extracted an executable that contacted an externa; server.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 6,
+        "text": "Security monitoring detected a malicious Office attachment attempting to launch a script interpreter.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 7,
+        "text": "An email attachment disguised as a shipping receipt initiated suspicious activity shortly after it was opened.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 8,
+        "text": "A target phishing email contained a document with embedded content that attempted to execute malware.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 9,
+        "text": "PowerShell was launched with an encoded command from a user workstation.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 10,
+        "text": "A shell script executed automatically after a suspicious archive was extracted.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 11,
+        "text": "An endpoint executed a command interpreter to download additinal payloads from a remote host.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 12,
+        "text": "The EDR platform detected a batch script spawning multiple child processes.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 13,
+        "text": "Python was used to executed a sequence of system commands outside normal administrative activity.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },    
+    {
+        "id": 14,
+        "text": "A script interpreter launched from Microsoft Office immediately after a document was opened.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 15,
+        "text": "Command execution activity originated from a temporary directory with obfuscated arguments.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 16,
+        "text": "Encoded PowerShell commands attempted to disable endpoint protection before continuing execution.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 17,
+        "text": "A dormant employee account successfully authenicated to a sensitive internal application after serveral onths of inactivity.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 18,
+        "text": "Administrative credentials were used from anew geographic location during non-business hours.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 19,
+        "text": "A privileged service account logged into systems it had never previously accessed.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 20,
+        "text": "Authentication logs showed repeated successful access using legitimate VPN credentials fro an unfamiliar device.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 21,
+        "text": "An account normally used only for backups authenticated interactively on a workstation.",
+        "technique_id":"T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 22,
+        "text": "Security monitoring identified successful access with a desabled employee's credentials before the account was revoked.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 23,
+        "text": "A shared administrator account acessed multiple production servers in rapid succession.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 24,
+        "text": "A workstation initiated Remote Desktop connections to several internal servers within minutes.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 25,
+        "text": "An administatior account established SMB sessions scross multiple hosts shortly after initial access.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 26,
+        "text": "SSH connections originated from an engineering workstation to systerm outside its normal management scope.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 27,
+        "text": "Remote management tools were used to execute commands on several endpoints from a single account.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 28,
+        "text": "Windows Remote Management traffic increased significantly between internal servers overnight.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 29,
+        "text": "Multiple hosts received remote administrative session shortly after suspicious autherntication events.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 30,
+        "text": "A compromised endpoint intitiated lateral movement using remote service protocols to additional systems.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 31,
+        "text": "Invoice attachment executed immediately after opening.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 32,
+        "text": "The email referenced an overdue payment and included a Word document that prompted the recipient to enable editing before embedded content attempted to run.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 33,
+        "text": "Outlook delivered a targeted message with a ZIP attachment containing a dishuised executable.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 34,
+        "text": "User reported a suspicious contract document receved from an external sender.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 35,
+        "text": "Security telemetry showed an Office attachment spawning a chlid process that connected to an external IP moments after the document was opened.",
+        "technique_id": "T1566.001",
+        "technique_name": "Sprearphishing Attachment"
+    },
+    {
+        "id": 36,
+        "text": "cmd.exe launched from an unusual directory.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 37,
+        "text": "PowerShell downloaded and executed a remote script using an encoded command line.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 38,
+        "text": "A Bash shell was invoked by a scheduled task shortly after an archive was extracted onto the server.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 39,
+        "text": "Script execution detected.",
+        "technique_id": "T1059",
+        "technique_name":  "Command and Scripting Interpreter"
+    },
+    {
+        "id": 40,
+        "text": "Python automation unexpectedly executed operating system commands that created new local users and modified scheduled tasks.",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "id": 41,
+        "text": "A valid VPN account logged in from a previously unseen device.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 42,
+        "text": "Okta logs showed successful authentication using legtimate credentials immediately after repeated failed login attempts.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 43,
+        "text": "Shared administrator account used overnight.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 44,
+        "text": "A service account authenticated to serveral production systems outside its established baseline without triggering MFA challenges.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 45,
+        "text": "Legitimate credentials were used to access cloud resources from a foreign location.",
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts"
+    },
+    {
+        "id": 46,
+        "text": "RDP session established to an internal server.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 47,
+        "text": "SSH was used to access multiple Linux hosts from a workstation that normally never performs administration.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 48,
+        "text": "Remote service enabled lateral movement between serveral Windows servers using SMB administrative shares.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 49,
+        "text": "Unexpected WinRM connections detected.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "id": 50,
+        "text": "PcExec was observed executing commands remotely across multiple endpoints shortly after a privileged account authenticated successfully.",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    }
+]
