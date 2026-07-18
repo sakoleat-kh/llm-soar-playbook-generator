@@ -2,6 +2,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
 
+import time
+
 from app.services.chroma_service import search_techniques
 
 class TechniqueResult(BaseModel):
@@ -12,8 +14,8 @@ class TechniqueResult(BaseModel):
     confidence: float = Field(
         ...,
         ge=0.0,
-        le=1.0,
-        description="Confidence score between 0.0 and 1.0"
+        le=100.0,
+        description="Confidence score"
     )
 
 SYSTEM_PROMPT = """
@@ -40,7 +42,7 @@ def build_context(alert_text: str) -> str:
     """
     Build ATT&CK context using ChromaDB search.
     """
-    results = search_techniques(alert_text, n_results=5)
+    results = search_techniques(alert_text, n_results=3)
     if not results:
         return "Relevant ATT&Ck techniques:\nNone"
     
@@ -48,8 +50,8 @@ def build_context(alert_text: str) -> str:
 
     for tech in results:
         context += (
-            f"{tech['technique_id']}: {tech['name']} - "
-            f"{tech.get('document', '')}\n"
+            f"{tech['technique_id']} - "
+            f"{tech['name']}\n"
         )
     return context
                   
@@ -71,14 +73,20 @@ Candidate Techniques:
 )
 
 llm = ChatOllama(
-    model="llama3.1:latest",
+    model="qwen2.5:3b",
     temperature=0.1,
+    num_predict=64,
 )
 
 chain = prompt | llm.with_structured_output(TechniqueResult)
 
 def classify_alert(alert_text: str) -> TechniqueResult:
+    start = time.perf_counter()
+
     candidate_text = build_context(alert_text)
+    print(f"Search took {time.perf_counter()-start:.2f}s")
+
+    llm_start = time.perf_counter()
 
     result = chain.invoke(
         {
@@ -87,9 +95,6 @@ def classify_alert(alert_text: str) -> TechniqueResult:
         }
     )
 
-    if result.confidence > 1:
-        result.confidence /= 100.0
-
-    result.confidence = max(0.0, min(1.0, result.confidence))
+    print(f"LLM took {time.perf_counter()-llm_start:.2f}s")
 
     return result
