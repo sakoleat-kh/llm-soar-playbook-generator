@@ -18,28 +18,41 @@ class TechniqueResult(BaseModel):
 
 SYSTEM_PROMPT = """
 You are a cybersecurity analyst.
-Your task is to map a security alert to ONE MITRE ATT&CK technique.
-You will be given:
-1. The alert.
-2. candidate ATT&CK technique retrieved from a vector database.
 
-Choose ONLY ONE technique from the candidate list.
-Return ONLY JSON.
+You will receive:
+1, relevant ATT&Ck technique retrivend from a vector database.
+2. A security alert.
 
-Example:
-{{
-    "technique_id": " T1059.001",
-    "technique_name": "PowerShell",
-    "confidence": 0.92
+Choose the single best matching MITRE ATT&Ck technuqie.
 
-}}
+Use the retrieved techniques as primary context.
 
-confidence MUST be a decimaml between 0.0 and 1.0
+Return JSOn only with:
+- technique_id
+- technique_name
+- confidence
 
-Do NOT return percentages.
-Do NOT return markdown.
+Do not explain anything
 
 """
+
+def build_context(alert_text: str) -> str:
+    """
+    Build ATT&CK context using ChromaDB search.
+    """
+    results = search_techniques(alert_text, n_results=5)
+    if not results:
+        return "Relevant ATT&Ck techniques:\nNone"
+    
+    context = "Relevant ATT&Ck techniques:\n"
+
+    for tech in results:
+        context += (
+            f"{tech['technique_id']}: {tech['name']} - "
+            f"{tech.get('document', '')}\n"
+        )
+    return context
+                  
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -48,7 +61,7 @@ prompt = ChatPromptTemplate.from_messages(
             "human",
             """
 Alert:
-{alert}
+{alert_text}
 Candidate Techniques:
 {candidates}
 
@@ -65,28 +78,15 @@ llm = ChatOllama(
 chain = prompt | llm.with_structured_output(TechniqueResult)
 
 def classify_alert(alert_text: str) -> TechniqueResult:
-    """
-    Classify a security alert into the most likely MITRE ATT&CK technique.
-    Uses ChromaDB retrieval before querying the LLM.
-
-    """
-
-    candidates = search_techniques(alert_text, n_results=5)
-    candidate_text = "\n".join(
-        [
-            f"{c['technique_id']} - {c['name']}"
-            for c in candidates
-        ]
-    )
+    candidate_text = build_context(alert_text)
 
     result = chain.invoke(
         {
-            "alert": alert_text,
+            "alert_text": alert_text,
             "candidates": candidate_text,
         }
     )
 
-    # Normalize confidence if model returns percentage
     if result.confidence > 1:
         result.confidence /= 100.0
 
