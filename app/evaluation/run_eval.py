@@ -108,7 +108,7 @@ def print_summary(results: dict) -> None:
 
 def main() -> None:
     dataset = load_dataset(DATASET_PATH)
-    dataset = dataset[:10]
+    # dataset = dataset[:10]
     results = evaluate(dataset)
     save_results(results, OUTPUT_FILE)
 
