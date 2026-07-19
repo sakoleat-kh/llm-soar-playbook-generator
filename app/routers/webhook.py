@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.models.database import get_db
 from app.models.alert import Alert
 from app.services.normaliser import normalise_alert
 from app.services.sigma import AlertInput
+from app.services.background_classifier import classify_alert_background
 
 router = APIRouter()
 
@@ -20,8 +17,9 @@ router = APIRouter()
 #     source_system: str
 
 @router.post("/webhook/alert")
-async def recive_webhook(
+def recive_alert(
     alert: AlertInput,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     # Normalise the incoming alert
@@ -37,6 +35,11 @@ async def recive_webhook(
     db.add(db_alert)
     db.commit()
     db.refresh(db_alert)
+
+    background_tasks.add_task(
+        classify_alert_background,
+        db_alert.id
+    )
 
     # Return generated alert ID
     return {
@@ -78,3 +81,4 @@ def get_alert(
             detail="Alert not found",
         )
     return alert
+
