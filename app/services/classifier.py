@@ -1,10 +1,18 @@
+import logging
+import time
+from typing import Literal
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
-
-import time
-
+from langchain_core.exceptions import OutputParserException
 from app.services.chroma_service import search_techniques
+
+logger = logging.getLogger(__name__)
+
+MAX_RETRIES = 3
+BACKOFF = [2, 4, 8]
+CONFIDENCE_THRESHOLD = 0.5
 
 class TechniqueResult(BaseModel):
     """Predicted MITRE ATT&CK technique."""
@@ -14,47 +22,48 @@ class TechniqueResult(BaseModel):
     confidence: float = Field(
         ...,
         ge=0.0,
-        le=100.0,
+        le=1.0,
         description="Confidence score"
     )
+    path: Literal["llm", "fallback", "error"] = "llm"
+    error: str | None = None
 
 SYSTEM_PROMPT = """
-You are a cybersecurity analyst.
+You are an MITRE ATT&CK classifier.
 
-You will receive:
-1, relevant ATT&Ck technique retrivend from a vector database.
-2. A security alert.
+Return ONLY valid JSON matching this schema:
 
-Choose the single best matching MITRE ATT&Ck technuqie.
+{{
+    "technique_id": "...",
+    "technique_name": "...",
+    "confidence": 0.95
+}}
 
-Use the retrieved techniques as primary context.
+Rules:
+- confidence MUST be a decimal between 0.0 and 1.0.
+- Never return percentages like 95 or 87.
+- Return 0.95 instead of 95.
+- Return ONLY the JSON object.
+"""
 
-Return JSOn only with:
+SIMPLIFIED_PROMPT = """
+Return ONLY valid JSON.
+
+Fields:
 - technique_id
 - technique_name
 - confidence
 
-Do not explain anything
-
+Rules:
+- confidence must be a decimal between 0.0 and 1.0.
+- Never return percentages.
+- Example:
+{{
+    "technique_id": "T1059",
+    "technique_name": "Command and Scripting Interpreter",
+    "confidence": 0.93
+}}
 """
-
-def build_context(alert_text: str) -> str:
-    """
-    Build ATT&CK context using ChromaDB search.
-    """
-    results = search_techniques(alert_text, n_results=3)
-    if not results:
-        return "Relevant ATT&Ck techniques:\nNone"
-    
-    context = "Relevant ATT&Ck techniques:\n"
-
-    for tech in results:
-        context += (
-            f"{tech['technique_id']} - "
-            f"{tech['name']}\n"
-        )
-    return context
-                  
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -64,7 +73,7 @@ prompt = ChatPromptTemplate.from_messages(
             """
 Alert:
 {alert_text}
-Candidate Techniques:
+Revelant ATT&CK Techniques:
 {candidates}
 
 """,
@@ -80,21 +89,184 @@ llm = ChatOllama(
 
 chain = prompt | llm.with_structured_output(TechniqueResult)
 
-def classify_alert(alert_text: str) -> TechniqueResult:
-    start = time.perf_counter()
+def _invoke_chain(alert_text: str, candidates: str, system_prompt: str = SYSTEM_PROMPT):
+    
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            (
+                "human",
+                """
 
-    candidate_text = build_context(alert_text)
-    print(f"Search took {time.perf_counter()-start:.2f}s")
+Alert:
+{{alert_text}}
 
-    llm_start = time.perf_counter()
+Relevant ATT&CK Techniques:
+{{candidates}}
 
-    result = chain.invoke(
+""",
+            ),
+        ]
+    )
+
+    chain = prompt | llm.with_structured_output(TechniqueResult)
+
+    return chain.invoke(
         {
             "alert_text": alert_text,
-            "candidates": candidate_text,
+            "candidates": candidates,
         }
     )
 
-    print(f"LLM took {time.perf_counter()-llm_start:.2f}s")
+def _invoke_with_retry(alert_text: str, candidates: str):
+    simplified = False
 
+    for attempt in range(MAX_RETRIES):
+        try:
+            
+            if simplified:
+                retry_prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", SIMPLIFIED_PROMPT),
+                        (
+                            "human",
+                            """
+Alert:
+{{alert_text}}
+
+Relevant ATT&CK Techniques:
+{{candidates}}
+
+""",
+                        ),
+                    ]
+                )
+
+                retry_chain = (
+                    retry_prompt
+                    | llm.with_structured_output(TechniqueResult)
+                )
+                
+                result = retry_chain.invoke(
+                    {
+                        "alert_text": alert_text,
+                        "candidates": candidates,
+                    }
+                )
+
+            else:
+                result = _invoke_chain(alert_text, candidates)
+            
+            if result is None:
+                return None
+            
+            return result
+        
+        except OutputParserException:
+
+            logger.warning(
+                "Parser failure on attempt %d/%d",
+                attempt +1,
+                MAX_RETRIES,
+            )
+
+            simplified = True
+
+            if attempt < MAX_RETRIES -1:
+                time.sleep(BACKOFF[attempt])
+                continue
+
+            raise
+
+        except ConnectionError:
+
+            logger.exception("Cannot connect to Ollama.")
+
+            return TechniqueResult(
+                technique_id="ERROR",
+                technique_name="Ollama unavailable",
+                confidence=0.0,
+                path="error",
+                error="ConnectionError",
+            )
+
+def build_context(results: list[dict]) -> str:
+    """
+    Build ATT&CK context using ChromaDB search.
+    """
+
+    if not results:
+        return "Relevant ATT&CK techniques:\nNone"
+        
+    lines = []
+
+    for tech in results:
+        lines.append(
+            f"{tech['technique_id']} - "
+            f"{tech['name']}\n"
+            f"{tech.get('document', '')}"
+        )
+    return "\n".join(lines)
+                  
+def classify_alert(alert_text: str) -> TechniqueResult:
+    """Classify an alert using RAG with a ChromaDB fallback."""
+    context_results = search_techniques(alert_text, n_results=5)
+    context = build_context(context_results)
+
+    result = _invoke_with_retry(
+            alert_text,
+            context,
+
+    )
+    
+    if result is None:
+        logger.warning("Empty LLM response. Using ChromaDB fallback.")
+
+        if context_results:
+            
+            top = context_results[0]
+
+            return TechniqueResult(
+                technique_id=top["technique_id"],
+                technique_name=top["name"],
+                confidence=0.5,
+                path="fallback"
+            )
+        return TechniqueResult(
+                technique_id="UNKNOWN",
+                technique_name="UNKNOWN",
+                confidence=0.0,
+                path="fallback"
+        )
+    if result.path == "error":
+        return result
+        
+
+    if result.confidence >= CONFIDENCE_THRESHOLD:
+        result.path = "llm"
+        logger.info(
+            "classification_path=llm confidence=%2.f technique=%s",
+            result.confidence,
+            result.technique_id,
+        )
+        return result
+    
+    if context_results:
+        top = context_results[0]
+
+        logger.info(
+            "classification_path=fallback llm_confidence=%2.f fallback=%s",
+            result.confidence,
+            top["technique_id"],
+        )
+
+        return TechniqueResult(
+            technique_id=top["technique_id"],
+            technique_name=top["name"],
+            confidence=max(result.confidence, 0.5),
+            path="fallback"
+        )
+    
+    result.path = "llm"
     return result
+
