@@ -31,7 +31,17 @@ class TechniqueResult(BaseModel):
 SYSTEM_PROMPT = """
 You are an MITRE ATT&CK classifier.
 
-Return ONLY valid JSON matching this schema:
+You MUST classify the alert using ONLY ONE of the techniques provided under
+'Relevant ATT&CK Techniques'.
+
+Rules:
+- Do NOT invent technique IDs.
+- Do NOT return any technique that is not listed.
+- Choose exactly one candidate.
+- confidence must be between 0.0 and 1.0
+
+
+Return ONLY JSON:
 
 {{
     "technique_id": "...",
@@ -73,8 +83,13 @@ prompt = ChatPromptTemplate.from_messages(
             """
 Alert:
 {alert_text}
+
 Revelant ATT&CK Techniques:
 {candidates}
+
+Choose ONLY ONE technique from the list above.
+
+Do NOT invent another ATT&CK ID.
 
 """,
         ),
@@ -216,9 +231,26 @@ def classify_alert(alert_text: str) -> TechniqueResult:
     result = _invoke_with_retry(
             alert_text,
             context,
-
     )
-    
+
+    valid_ids = {tech["technique_id"] for tech in context_results}
+
+    if result is not None and result.technique_id not in valid_ids:
+        logger.warning(
+            "LLM return invalid technique %s. Using fallback.",
+            result.technique_id,
+        )
+
+        if context_results:
+            top = context_results[0]
+
+            return TechniqueResult(
+                technique_id=top["technique_id"],
+                technique_name=top["name"],
+                confidence=0.5,
+                path="fallback",
+            )
+
     if result is None:
         logger.warning("Empty LLM response. Using ChromaDB fallback.")
 
