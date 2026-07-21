@@ -11,7 +11,7 @@ from app.evaluation.baselines import (keyword_classifier, random_classifier)
 
 DATASET_PATH = Path("data/labelled_alert.json")
 OUTPUT_DIR = Path("data/eval_results")
-OUTPUT_FILE = OUTPUT_DIR / "v4_fallback.json"
+OUTPUT_FILE = OUTPUT_DIR / "final_classifier.json"
 
 def load_dataset(path: Path) -> list[dict]:
     with path.open("r", encoding="utf-8") as f:
@@ -48,6 +48,17 @@ def evaluate(dataset: list[dict]) -> dict:
         # LLM
         result = classify_alert(sample["text"])
         path_counts[result.path] += 1
+        if result.technique_id != truth:
+            print("\n" + "=" * 70)
+            print("MISCLASSIFIED SAMPLE")
+            print(f"ID          : {sample['id']}")
+            print(f"Expected    : {truth}")
+            print(f"Predicted   : {result.technique_id}")
+            print(f"Confidence  : {result.confidence:.2f}")
+            print("\nAlert:")
+            print(sample["text"])
+            print("=" * 70 + "\n")
+
 
         print("\n----------DEBUG----------")
         print(result)

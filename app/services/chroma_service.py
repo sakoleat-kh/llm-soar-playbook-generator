@@ -85,7 +85,7 @@ def search_techniques(query: str, n_results: int =5 ) -> list:
     ):
         output.append(
             {
-                "technique_id": technique_id,
+                "technique_id": metadata.get("technique_id"),
                 "name": metadata.get("name"),
                 "document": document,
                 "tactics": metadata.get("tactics"),

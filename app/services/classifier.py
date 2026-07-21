@@ -31,14 +31,34 @@ class TechniqueResult(BaseModel):
 SYSTEM_PROMPT = """
 You are an MITRE ATT&CK classifier.
 
-You MUST classify the alert using ONLY ONE of the techniques provided under
-'Relevant ATT&CK Techniques'.
+Your task is to identify the single ATT&Ck technique that best matches the alert.
 
-Rules:
-- Do NOT invent technique IDs.
-- Do NOT return any technique that is not listed.
-- Choose exactly one candidate.
-- confidence must be between 0.0 and 1.0
+Use the retrieved ATT&CK knowledge as supporting evidence, but prioritize the actual behaviors described in the alert.
+
+Decision rules:
+
+- T1566.001 (Phishing: Spearphishing Attachment)
+    - Email with malicious attachment.
+    - Delivery vector is the important behavior
+
+- T1059 (Command and Scripting Interpreter)
+    - PowerShell, cmd.exe, bash, Python, VBScript, shell execution.
+    - Focus on command execution.
+
+- T1078 (Valid Accounts)
+    - Legitimate credentials are used.
+    - Authentication itselt is the important behavior.
+
+- T1021 (Remote Services)
+    - RDP, SSH, WinRM, VNC or other remote services.
+
+Important distinction:
+
+if credentials are used only to authenticate:
+-> choose T1078
+
+If the alert mainly describes remote access throgh RDP/SSH/SMB/etc:
+-> choose T1021
 
 
 Return ONLY JSON:
@@ -84,12 +104,8 @@ prompt = ChatPromptTemplate.from_messages(
 Alert:
 {alert_text}
 
-Revelant ATT&CK Techniques:
+Relevant ATT&CK Techniques:
 {candidates}
-
-Choose ONLY ONE technique from the list above.
-
-Do NOT invent another ATT&CK ID.
 
 """,
         ),
@@ -98,7 +114,7 @@ Do NOT invent another ATT&CK ID.
 
 llm = ChatOllama(
     model="qwen2.5:3b",
-    temperature=0.1,
+    temperature=0.0,
     num_predict=64,
 )
 
@@ -114,10 +130,10 @@ def _invoke_chain(alert_text: str, candidates: str, system_prompt: str = SYSTEM_
                 """
 
 Alert:
-{{alert_text}}
+{alert_text}
 
 Relevant ATT&CK Techniques:
-{{candidates}}
+{candidates}
 
 """,
             ),
@@ -147,10 +163,10 @@ def _invoke_with_retry(alert_text: str, candidates: str):
                             "human",
                             """
 Alert:
-{{alert_text}}
+{alert_text}
 
 Relevant ATT&CK Techniques:
-{{candidates}}
+{candidates}
 
 """,
                         ),
@@ -168,6 +184,15 @@ Relevant ATT&CK Techniques:
                         "candidates": candidates,
                     }
                 )
+                formatted = prompt.format_messages(
+                    alert_text=alert_text,
+                    candidates=candidates,
+                )
+
+                print("\n==== PROMPT SENT TO LLM ====")
+                for msg in formatted:
+                    print(msg.content)
+                print("==============================")
 
             else:
                 result = _invoke_chain(alert_text, candidates)
@@ -179,7 +204,7 @@ Relevant ATT&CK Techniques:
         
         except OutputParserException:
 
-            logger.warning(
+            logger.warning( 
                 "Parser failure on attempt %d/%d",
                 attempt +1,
                 MAX_RETRIES,
@@ -228,10 +253,18 @@ def classify_alert(alert_text: str) -> TechniqueResult:
     context_results = search_techniques(alert_text, n_results=5)
     context = build_context(context_results)
 
+    print("===== CONTEXT =====")
+    print(context)
+    print("===================")
+
     result = _invoke_with_retry(
             alert_text,
             context,
     )
+
+    print("\n========== RESULT ==========")
+    print(result)
+    print("===============================")
 
     valid_ids = {tech["technique_id"] for tech in context_results}
 
