@@ -154,48 +154,18 @@ def _invoke_with_retry(alert_text: str, candidates: str):
 
     for attempt in range(MAX_RETRIES):
         try:
-            
             if simplified:
-                retry_prompt = ChatPromptTemplate.from_messages(
-                    [
-                        ("system", SIMPLIFIED_PROMPT),
-                        (
-                            "human",
-                            """
-Alert:
-{alert_text}
-
-Relevant ATT&CK Techniques:
-{candidates}
-
-""",
-                        ),
-                    ]
+                result = _invoke_chain(
+                    alert_text,
+                    candidates,
+                    SIMPLIFIED_PROMPT
                 )
-
-                retry_chain = (
-                    retry_prompt
-                    | llm.with_structured_output(TechniqueResult)
-                )
-                
-                result = retry_chain.invoke(
-                    {
-                        "alert_text": alert_text,
-                        "candidates": candidates,
-                    }
-                )
-                formatted = prompt.format_messages(
-                    alert_text=alert_text,
-                    candidates=candidates,
-                )
-
-                print("\n==== PROMPT SENT TO LLM ====")
-                for msg in formatted:
-                    print(msg.content)
-                print("==============================")
-
             else:
-                result = _invoke_chain(alert_text, candidates)
+                result = _invoke_chain(
+                    alert_text,
+                    candidates,
+                    SYSTEM_PROMPT,
+                )
             
             if result is None:
                 return None
@@ -266,6 +236,9 @@ def classify_alert(alert_text: str) -> TechniqueResult:
     print(result)
     print("===============================")
 
+    if result is not None and result.path == "error":
+        return result
+
     valid_ids = {tech["technique_id"] for tech in context_results}
 
     if result is not None and result.technique_id not in valid_ids:
@@ -303,9 +276,6 @@ def classify_alert(alert_text: str) -> TechniqueResult:
                 confidence=0.0,
                 path="fallback"
         )
-    if result.path == "error":
-        return result
-        
 
     if result.confidence >= CONFIDENCE_THRESHOLD:
         result.path = "llm"
