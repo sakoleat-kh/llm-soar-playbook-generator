@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import webhook
+from app.routers import webhook, techniques
 from app.models.database import Base, engine
 
 # Import models so metadata knows about them
@@ -13,4 +13,4 @@ def startup():
     Base.metadata.create_all(bind=engine)
 
 app.include_router(webhook.router)
-
+app.include_router(techniques.router)
