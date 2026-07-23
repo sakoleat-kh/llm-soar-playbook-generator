@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from app.routers import webhook, techniques, shuffle
+from app.routers import webhook, techniques, shuffle, playbook
 from app.models.database import Base, engine
+
+from fastapi.staticfiles import StaticFiles
 
 # Import models so metadata knows about them
 from app.models.alert import Alert
@@ -16,3 +18,10 @@ def startup():
 app.include_router(webhook.router)
 app.include_router(techniques.router)
 app.include_router(shuffle.router)
+app.include_router(playbook.router)
+
+app.mount(
+    "/static",
+    StaticFiles(directory="static"),
+    name="static"
+)

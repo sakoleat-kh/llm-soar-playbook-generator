@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOAR Playbook Review</title>
+        <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f4f4f4;
+        }
+
+        textarea{
+            padding: 10px 20px;
+            margin-top: 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result{
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        ol{
+            margin-top: 15px;
+        }
+
+        details{
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>SOAR Playbook Review</h1>
+
+    <textarea
+    id="alertText"
+    placeholder="Paste security alert here..."
+    ></textarea>
+
+    <br>
+
+    <button id="submitBtn">
+    Submit
+    </button>
+
+    <div id="status"></div>
+
+    <div id="result"></div>
+
+    <script src="review.js"></script>
+    
+</body>
+</html>

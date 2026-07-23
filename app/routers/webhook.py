@@ -9,6 +9,7 @@ from app.services.background_classifier import classify_alert_background
 
 router = APIRouter()
 
+
 @router.post("/webhook/alert")
 def recive_alert(
     alert: AlertInput,
