@@ -1,10 +1,18 @@
+
 from __future__ import annotations
+
+from app.services.sigma_service import get_sigma_rules
+
 
 from pydantic import BaseModel
 from typing import List
 
 
 def generate_playbook(technique_id: str, technique_name: str, alert_summary: str) -> PlaybookDraft:
+    sigma_rules = get_sigma_rules(technique_id)
+
+    print("===== SIGMA RULES =====")
+    print(sigma_rules)
     return PlaybookDraft(
         technique_id=technique_id,
         technique_name=technique_name,
@@ -46,8 +54,12 @@ def generate_playbook(technique_id: str, technique_name: str, alert_summary: str
                 expected_outcome="System is operational."
             ),
         ],
+        sigma_rules=sigma_rules,
     )
 
+class SigmaRule(BaseModel):
+    title: str
+    raw_url: str
 
 class PlaybookStep(BaseModel):
     step_num: int
@@ -61,6 +73,7 @@ class PlaybookDraft(BaseModel):
     technique_name: str
     alert_summary: str
     steps: List[PlaybookStep]
+    sigma_rules: List[SigmaRule] = []
 
 
 

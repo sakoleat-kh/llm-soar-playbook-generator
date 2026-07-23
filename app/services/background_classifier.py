@@ -26,6 +26,9 @@ def classify_alert_background(alert_id: str) -> None:
             technique_name=result.technique_name,
             alert_summary=alert.normalised_json,
         )
+        print("\n==== PLAYBOOK DRAFT ====")
+        print(draft.model_dump())
+
         workflow = render_shuffle_workflow(
             draft=draft,
             alert_id=alert.id,

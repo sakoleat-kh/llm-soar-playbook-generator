@@ -9,13 +9,6 @@ from app.services.background_classifier import classify_alert_background
 
 router = APIRouter()
 
-# class AlertInput(BaseModel):
-#     sender: str
-#     subject: str
-#     body_text: str
-#     severity : int = 5
-#     source_system: str
-
 @router.post("/webhook/alert")
 def recive_alert(
     alert: AlertInput,
