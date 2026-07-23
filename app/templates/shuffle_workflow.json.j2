@@ -1,39 +1,623 @@
 {
-"name": "{{ workflow_name }}",
-"description": "{{ alert_desciption }}",
-"start": "{{ start_node }}",
-
-"actions": [
-{% for step in step %}
-{
-"id": "{{ step.id }}",
-"label": "{{ step.step_name }}",
-"name": "{{ step.action }}",
-"app_name": "{{ step.app_name }}",
-"app_version": "{{ step.app_version }}",
-"position": {
-"x": {{ step.x }},
-"y": {{ step.y }}
-},
-"parameters": {{ step.parameters | tojson }}
-}{% if not loop.last %},{% endif %}
-{% endfor %}
-],
-
-"branches": [],
-
-"triggers": [],
-
-"configuration": {
-"exit_on_error": false,
-"start_from_top": false,
-"skip_notifications": false
-},
-
-"workflow_variables": [
-{
-"technique_id": "{{ technique_id }}",
-"technique_name": "{{ technique_name }}"
-}
-]
+    "workflow_as_code": false,
+    "actions": [
+        {
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "description": "Generated playbook for {{ draft.technique_name }}",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "errors": null,
+            "id": "1e4a28aa-c315-4b34-a593-d15185989bf7",
+            "is_valid": true,
+            "isStartNode": true,
+            "sharing": true,
+            "label": "Start Incident Response",
+            "public": true,
+            "generated": false,
+            "large_image": "data:image/png;base64,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",
+            "environment": "Cloud",
+            "name": "Playbook - {{ draft.technique_id }}",
+            "parameters": [
+                {
+                    "description": "",
+                    "id": "",
+                    "name": "call",
+                    "example": "Repeating: Hello World",
+                    "value": "{{ draft.steps[0].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": false,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": ""
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "execution_variable": {
+                "description": "",
+                "id": "",
+                "name": "",
+                "value": ""
+            },
+            "position": {
+                "x": 315.21428571428567,
+                "y": -33.90000000000001
+            },
+            "authentication_id": "",
+            "category": "",
+            "reference_url": "",
+            "sub_action": false,
+            "run_magic_output": false,
+            "run_magic_input": false,
+            "execution_delay": 0,
+            "category_label": null,
+            "suggestion": false,
+            "parent_controlled": false,
+            "source_workflow": "",
+            "source_execution": "",
+            "_id": "1e4a28aa-c315-4b34-a593-d15185989bf7",
+            "type": "ACTION",
+            "example": "",
+            "flowOrientation": "vertical",
+            "circleId": "56bbcdb5-4afe-4934-a87b-3f73dc01df63",
+            "authentication": [],
+            "selectedAuthentication": {}
+        },
+        {
+            "name": "repeat_back_to_me",
+            "label": "{{ draft.steps[0].step_name }}",
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "sharing": true,
+            "private_id": "",
+            "description": "{{ draft.steps[0].action }}",
+            "environment": "Cloud",
+            "errors": [],
+            "id_": "feb1a5e7-1d52-460d-94ac-d8436bd8a3a5",
+            "_id_": "feb1a5e7-1d52-460d-94ac-d8436bd8a3a5",
+            "id": "feb1a5e7-1d52-460d-94ac-d8436bd8a3a5",
+            "is_valid": true,
+            "type": "ACTION",
+            "parameters": [
+                {
+                    "description": "The message to repeat",
+                    "id": "",
+                    "name": "call",
+                    "example": "REPEATING: Hello world",
+                    "value": "{{ draft.steps[0].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": true,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "isStartNode": false,
+            "large_image": "data:image/svg+xml;utf-8,%3Csvg%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M7.417%208.667V11.167H9.917%20M16.583%2015.333V12.833H14.083%20M15.538%2010.75C15.326%2010.153%2014.967%209.619%2014.494%209.198C14.020%208.777%2013.448%208.483%2012.830%208.343C12.212%208.204%2011.569%208.223%2010.960%208.399C10.352%208.575%209.798%208.902%209.350%209.35L7.417%2011.167M16.583%2012.833L14.650%2014.65C14.202%2015.098%2013.648%2015.425%2013.040%2015.601C12.431%2015.777%2011.788%2015.796%2011.170%2015.657C10.552%2015.517%209.980%2015.223%209.507%2014.802C9.033%2014.381%208.674%2013.847%208.463%2013.25%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%220.75%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E",
+            "run_magic_output": false,
+            "authentication": [],
+            "example": "",
+            "required_body_fields": null,
+            "category": "AI",
+            "authentication_id": "",
+            "template": false,
+            "finished": true,
+            "flowOrientation": "horizontal",
+            "streamRemoveSent": false,
+            "position": {
+                "x": 300,
+                "y": 150
+            },
+            "fillGradient": [
+                "rgba(242, 101, 59, 1)",
+                "rgba(242, 101, 59, 1)"
+            ],
+            "fillstyle": "linear-gradient",
+            "selectedAuthentication": {},
+            "execution_delay": 0
+        },
+        {
+            "name": "repeat_back_to_me",
+            "label": "{{ draft.steps[1].step_name }}",
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "sharing": true,
+            "private_id": "",
+            "description": "Repeats the call parameter",
+            "environment": "Cloud",
+            "errors": [],
+            "id_": "3e12888a-48f8-4b52-b0b3-06840f39a6c9",
+            "_id_": "3e12888a-48f8-4b52-b0b3-06840f39a6c9",
+            "id": "3e12888a-48f8-4b52-b0b3-06840f39a6c9",
+            "is_valid": true,
+            "type": "ACTION",
+            "parameters": [
+                {
+                    "description": "The message to repeat",
+                    "id": "9ccdf644-5cf0-4521-9b52-cb64f41c072e",
+                    "name": "call",
+                    "example": "REPEATING: Hello world",
+                    "value": "{{ draft.steps[1].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": true,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "isStartNode": false,
+            "large_image": "data:image/svg+xml;utf-8,%3Csvg%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M7.417%208.667V11.167H9.917%20M16.583%2015.333V12.833H14.083%20M15.538%2010.75C15.326%2010.153%2014.967%209.619%2014.494%209.198C14.020%208.777%2013.448%208.483%2012.830%208.343C12.212%208.204%2011.569%208.223%2010.960%208.399C10.352%208.575%209.798%208.902%209.350%209.35L7.417%2011.167M16.583%2012.833L14.650%2014.65C14.202%2015.098%2013.648%2015.425%2013.040%2015.601C12.431%2015.777%2011.788%2015.796%2011.170%2015.657C10.552%2015.517%209.980%2015.223%209.507%2014.802C9.033%2014.381%208.674%2013.847%208.463%2013.25%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%220.75%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E",
+            "run_magic_output": false,
+            "authentication": [],
+            "example": "",
+            "required_body_fields": null,
+            "category": "AI",
+            "authentication_id": "",
+            "template": false,
+            "finished": true,
+            "flowOrientation": "horizontal",
+            "streamRemoveSent": false,
+            "position": {
+                "x": 300,
+                "y": 350
+            },
+            "fillGradient": [
+                "rgba(242, 101, 59, 1)",
+                "rgba(242, 101, 59, 1)"
+            ],
+            "fillstyle": "linear-gradient",
+            "selectedAuthentication": {}
+        },
+        {
+            "name": "repeat_back_to_me",
+            "label": "{{ draft.steps[2].step_name }}",
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "sharing": true,
+            "private_id": "",
+            "description": "Repeats the call parameter",
+            "environment": "Cloud",
+            "errors": [],
+            "id_": "1c9dafe9-c2d2-4ce4-9556-49ac23e07a3f",
+            "_id_": "1c9dafe9-c2d2-4ce4-9556-49ac23e07a3f",
+            "id": "1c9dafe9-c2d2-4ce4-9556-49ac23e07a3f",
+            "is_valid": true,
+            "type": "ACTION",
+            "parameters": [
+                {
+                    "description": "The message to repeat",
+                    "id": "89b47720-ef0e-4fda-8df8-cce26ef461a0",
+                    "name": "call",
+                    "example": "REPEATING: Hello world",
+                    "value": "{{ draft.steps[2].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": true,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "isStartNode": false,
+            "large_image": "data:image/svg+xml;utf-8,%3Csvg%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M7.417%208.667V11.167H9.917%20M16.583%2015.333V12.833H14.083%20M15.538%2010.75C15.326%2010.153%2014.967%209.619%2014.494%209.198C14.020%208.777%2013.448%208.483%2012.830%208.343C12.212%208.204%2011.569%208.223%2010.960%208.399C10.352%208.575%209.798%208.902%209.350%209.35L7.417%2011.167M16.583%2012.833L14.650%2014.65C14.202%2015.098%2013.648%2015.425%2013.040%2015.601C12.431%2015.777%2011.788%2015.796%2011.170%2015.657C10.552%2015.517%209.980%2015.223%209.507%2014.802C9.033%2014.381%208.674%2013.847%208.463%2013.25%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%220.75%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E",
+            "run_magic_output": false,
+            "authentication": [],
+            "example": "",
+            "required_body_fields": null,
+            "category": "AI",
+            "authentication_id": "",
+            "template": false,
+            "finished": true,
+            "flowOrientation": "horizontal",
+            "streamRemoveSent": false,
+            "position": {
+                "x": 300,
+                "y": 550
+            },
+            "fillGradient": [
+                "rgba(242, 101, 59, 1)",
+                "rgba(242, 101, 59, 1)"
+            ],
+            "fillstyle": "linear-gradient",
+            "selectedAuthentication": {}
+        },
+        {
+            "name": "repeat_back_to_me",
+            "label": "{{ draft.steps[3].step_name }}",
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "sharing": true,
+            "private_id": "",
+            "description": "Repeats the call parameter",
+            "environment": "Cloud",
+            "errors": [],
+            "id_": "5bfc7b35-88eb-44b4-a779-87f6cdd34741",
+            "_id_": "5bfc7b35-88eb-44b4-a779-87f6cdd34741",
+            "id": "5bfc7b35-88eb-44b4-a779-87f6cdd34741",
+            "is_valid": true,
+            "type": "ACTION",
+            "parameters": [
+                {
+                    "description": "The message to repeat",
+                    "id": "30e2fc40-ef33-44c6-b298-40a63b210948",
+                    "name": "call",
+                    "example": "REPEATING: Hello world",
+                    "value": "{{ draft.steps[3].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": true,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "isStartNode": false,
+            "large_image": "data:image/svg+xml;utf-8,%3Csvg%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M7.417%208.667V11.167H9.917%20M16.583%2015.333V12.833H14.083%20M15.538%2010.75C15.326%2010.153%2014.967%209.619%2014.494%209.198C14.020%208.777%2013.448%208.483%2012.830%208.343C12.212%208.204%2011.569%208.223%2010.960%208.399C10.352%208.575%209.798%208.902%209.350%209.35L7.417%2011.167M16.583%2012.833L14.650%2014.65C14.202%2015.098%2013.648%2015.425%2013.040%2015.601C12.431%2015.777%2011.788%2015.796%2011.170%2015.657C10.552%2015.517%209.980%2015.223%209.507%2014.802C9.033%2014.381%208.674%2013.847%208.463%2013.25%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%220.75%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E",
+            "run_magic_output": false,
+            "authentication": [],
+            "example": "",
+            "required_body_fields": null,
+            "category": "AI",
+            "authentication_id": "",
+            "template": false,
+            "finished": true,
+            "flowOrientation": "horizontal",
+            "streamRemoveSent": false,
+            "position": {
+                "x": 300,
+                "y": 750
+            },
+            "fillGradient": [
+                "rgba(242, 101, 59, 1)",
+                "rgba(242, 101, 59, 1)"
+            ],
+            "fillstyle": "linear-gradient",
+            "selectedAuthentication": {}
+        },
+        {
+            "name": "repeat_back_to_me",
+            "label": "{{ draft.steps[4].step_name }}",
+            "app_name": "Shuffle Tools",
+            "app_version": "1.2.0",
+            "app_id": "3e2bdf9d5069fe3f4746c29d68785a6a",
+            "sharing": true,
+            "private_id": "",
+            "description": "Repeats the call parameter",
+            "environment": "Cloud",
+            "errors": [],
+            "id_": "89eee69c-7ab8-426f-9674-c727f04b51aa",
+            "_id_": "89eee69c-7ab8-426f-9674-c727f04b51aa",
+            "id": "89eee69c-7ab8-426f-9674-c727f04b51aa",
+            "is_valid": true,
+            "type": "ACTION",
+            "parameters": [
+                {
+                    "description": "The message to repeat",
+                    "id": "26fc6d00-7e34-4dc9-b02b-c5f7b554c70d",
+                    "name": "call",
+                    "example": "REPEATING: Hello world",
+                    "value": "{{ draft.steps[4].action }}",
+                    "multiline": true,
+                    "multiselect": false,
+                    "options": null,
+                    "action_field": "",
+                    "variant": "",
+                    "required": true,
+                    "configuration": false,
+                    "tags": null,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "skip_multicheck": false,
+                    "custom_value": false,
+                    "value_replace": null,
+                    "unique_toggled": false,
+                    "error": "",
+                    "hidden": false
+                }
+            ],
+            "isStartNode": false,
+            "large_image": "data:image/svg+xml;utf-8,%3Csvg%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d=%22M7.417%208.667V11.167H9.917%20M16.583%2015.333V12.833H14.083%20M15.538%2010.75C15.326%2010.153%2014.967%209.619%2014.494%209.198C14.020%208.777%2013.448%208.483%2012.830%208.343C12.212%208.204%2011.569%208.223%2010.960%208.399C10.352%208.575%209.798%208.902%209.350%209.35L7.417%2011.167M16.583%2012.833L14.650%2014.65C14.202%2015.098%2013.648%2015.425%2013.040%2015.601C12.431%2015.777%2011.788%2015.796%2011.170%2015.657C10.552%2015.517%209.980%2015.223%209.507%2014.802C9.033%2014.381%208.674%2013.847%208.463%2013.25%22%20fill=%22none%22%20stroke=%22white%22%20stroke-width=%220.75%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E",
+            "run_magic_output": false,
+            "authentication": [],
+            "example": "",
+            "required_body_fields": null,
+            "category": "AI",
+            "authentication_id": "",
+            "template": false,
+            "finished": true,
+            "flowOrientation": "horizontal",
+            "streamRemoveSent": false,
+            "position": {
+                "x": 300,
+                "y": 950
+            },
+            "fillGradient": [
+                "rgba(242, 101, 59, 1)",
+                "rgba(242, 101, 59, 1)"
+            ],
+            "fillstyle": "linear-gradient",
+            "selectedAuthentication": {}
+        }
+    ],
+    "branches": [
+        {
+            "source_id": "1e4a28aa-c315-4b34-a593-d15185989bf7",
+            "destination_id": "feb1a5e7-1d52-460d-94ac-d8436bd8a3a5",
+            "id_": "3d28fa31-273d-4ae1-a8a4-2d252bf90aaf",
+            "id": "3d28fa31-273d-4ae1-a8a4-2d252bf90aaf",
+            "hasErrors": false,
+            "decorator": false
+        },
+        {
+            "source_id": "feb1a5e7-1d52-460d-94ac-d8436bd8a3a5",
+            "destination_id": "3e12888a-48f8-4b52-b0b3-06840f39a6c9",
+            "id_": "700c5467-bb9c-48a0-9a18-20b08befe9f3",
+            "id": "700c5467-bb9c-48a0-9a18-20b08befe9f3",
+            "hasErrors": false,
+            "decorator": false
+        },
+        {
+            "source_id": "3e12888a-48f8-4b52-b0b3-06840f39a6c9",
+            "destination_id": "1c9dafe9-c2d2-4ce4-9556-49ac23e07a3f",
+            "id_": "63e75809-c236-444f-9ce9-865af7af06aa",
+            "id": "63e75809-c236-444f-9ce9-865af7af06aa",
+            "hasErrors": false,
+            "decorator": false
+        },
+        {
+            "source_id": "1c9dafe9-c2d2-4ce4-9556-49ac23e07a3f",
+            "destination_id": "5bfc7b35-88eb-44b4-a779-87f6cdd34741",
+            "id_": "30a97190-69f6-40be-a8b6-b8fe60092f72",
+            "id": "30a97190-69f6-40be-a8b6-b8fe60092f72",
+            "hasErrors": false,
+            "decorator": false
+        },
+        {
+            "source_id": "5bfc7b35-88eb-44b4-a779-87f6cdd34741",
+            "destination_id": "89eee69c-7ab8-426f-9674-c727f04b51aa",
+            "id_": "63633b34-f82f-47ad-bf09-2c5bca8e17f9",
+            "id": "63633b34-f82f-47ad-bf09-2c5bca8e17f9",
+            "hasErrors": false,
+            "decorator": false
+        }
+    ],
+    "visual_branches": [],
+    "triggers": [],
+    "comments": [],
+    "configuration": {
+        "exit_on_error": false,
+        "start_from_top": false,
+        "skip_notifications": false
+    },
+    "created": 1784705365,
+    "edited": 1784705366,
+    "last_runtime": 0,
+    "due_date": 0,
+    "id": "6af37396-dc4d-4bb1-bc71-808500535072",
+    "is_valid": true,
+    "name": "Playbook - {{ draft.technique_id }}",
+    "description": "Generated playbook for {{ draft.technique_name }}",
+    "start": "1e4a28aa-c315-4b34-a593-d15185989bf7",
+    "owner": "62a4c19e-2898-40db-837f-f11c1cc92aba",
+    "sharing": "private",
+    "execution_org": {
+        "name": "sakol0361@gmail.com",
+        "id": "64e378d6-69c6-401e-af79-ff5ac2b44bbe",
+        "users": [],
+        "role": "admin",
+        "child_orgs": null,
+        "region_url": "https://shuffler.io",
+        "is_partner": false,
+        "image": "",
+        "creator_org": "",
+        "branding": {
+            "enable_chat": false,
+            "home_url": "",
+            "theme": "",
+            "documentation_link": "",
+            "global_user": false,
+            "support_email": "",
+            "logout_url": "",
+            "brand_color": "",
+            "brand_name": ""
+        }
+    },
+    "org_id": "64e378d6-69c6-401e-af79-ff5ac2b44bbe",
+    "workflow_variables": null,
+    "execution_environment": "",
+    "previously_saved": false,
+    "categories": {
+        "siem": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "communication": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "assets": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "cases": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "network": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "intel": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "edr": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "iam": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "ai": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "email": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        },
+        "other": {
+            "name": "",
+            "count": 0,
+            "id": "",
+            "description": "",
+            "large_image": ""
+        }
+    },
+    "example_argument": "",
+    "public": false,
+    "default_return_value": "",
+    "contact_info": {
+        "name": "",
+        "url": ""
+    },
+    "published_id": "",
+    "revision_id": "",
+    "usecase_ids": [],
+    "input_questions": null,
+    "form_control": {
+        "input_markdown": "",
+        "output_yields": null,
+        "cleanup_actions": null,
+        "form_width": 0
+    },
+    "blogpost": "",
+    "video": "",
+    "status": "",
+    "workflow_type": "",
+    "generated": false,
+    "hidden": false,
+    "background_processing": false,
+    "updated_by": "",
+    "validated": false,
+    "validation": {
+        "valid": false,
+        "changed_at": 0,
+        "last_valid": 0,
+        "validation_ran": false,
+        "notifications_created": 0,
+        "environment": "",
+        "workflow_id": "",
+        "execution_id": "",
+        "node_id": "",
+        "total_problems": 0,
+        "errors": [],
+        "subflow_apps": []
+    },
+    "parentorg_workflow": "",
+    "childorg_workflow_ids": null,
+    "suborg_distribution": null,
+    "backup_config": {
+        "onprem_backup": false,
+        "upload_repo": "",
+        "upload_branch": "",
+        "upload_username": "",
+        "upload_token": "",
+        "tokens_encrypted": false
+    },
+    "auth_groups": null,
+    "isValid": true,
+    "errors": []
 }
