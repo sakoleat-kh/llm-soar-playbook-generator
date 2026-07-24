@@ -65,12 +65,54 @@ submitBtn.onclick = async () => {
                 );
 
                 if (playbookResponse.ok) {
-                    playbook = await playbookResponse.json();
+                    playbook = await playbookResponse.json();                    
                     break;
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
+
+            const workflow = JSON.parse(playbook.playbook_json);
+
+            const sigmaRules = workflow.sigma_rules || [];
+
+            const actions = workflow.actions || [];
+
+            let stepsHtml = "<ol>";
+
+            actions.forEach(action => {
+                if (action.label) {
+                    stepsHtml += `
+                    <li>
+                        <strong>${action.label}</strong><br>
+                        ${action.description || ""}
+                    </li>
+                    `;
+                }
+            });
+
+            stepsHtml += "</ol>";
+
+            let sigmaHtml = `
+                <details>
+                    <summary><strong>Sigma Rules</strong></summary>
+                `;
+            if (sigmaRules.length == 0) {
+                sigmaHtml += `<p>No Sigma rules available.</p>`;
+            } else {
+                sigmaRules.forEach(rule => {
+                    sigmaHtml += `
+                        <div style="margin-bottom:10px;">
+                            <strong>${rule.title}</strong><br>
+                            <a href="${rule.raw_url}" target="_blank">
+                                View Sigma Rule
+                            </a>
+                        </div>
+                    `;
+                });
+            }
+            sigmaHtml += `</details>`;
+
 
             document.getElementById("result").innerHTML = `
                 <h2>${alertData.technique_name}</h2>
@@ -81,9 +123,13 @@ submitBtn.onclick = async () => {
 
                 <h3>Generated Playbook</h3>
 
-                <pre>${playbook.playbook_json}</pre>
+                ${stepsHtml}
 
                 <br>
+
+                ${sigmaHtml}
+
+                <br><br>
 
                 <button id="approveBtn">Approve</button>
                 <button id="rejectBtn">Reject</button>
