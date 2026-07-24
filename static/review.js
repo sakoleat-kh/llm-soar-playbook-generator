@@ -146,35 +146,50 @@ submitBtn.onclick = async () => {
 
                 if (!response.ok) {
                     console.error(await response.text());
-                    alert("Approve failed.");
+
+                    document.getElementById("actionStatus").innerHTML =
+                    `<p style="color:red">Approve failed.</p>`;
+
                     return;
                 }
 
                 const result = await response.json();
 
-                alert(result.message);
+                document.getElementById("actionStatus").innerHTML = 
+                `<p style="color:green">${result.message}</p>`;
 
             });
 
 
             document.getElementById("rejectBtn").addEventListener("click", async () => {
 
+                const reason = prompt("Enter rejection reason (optional):");
+
                 const response = await fetch(
                     `/playbooks/${data.alert_id}/reject`,
                     {
-                        method: "POST"
+                        method: "POST",
+                        headers:{
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            reason
+                        })
                     }
                 );
 
                 if (!response.ok) {
                     console.error(await response.text());
-                    alert("Reject failed.");
+                    document.getElementById("actionStatus").innerHTML = 
+                    `<p style = "color:red">Reject failed.</p>`;
+
                     return;
                 }
 
                 const result = await response.json();
 
-                alert(result.message);
+                document.getElementById("actionStatus").innerHTML =
+                `<p style="color:green">${result.message}</p>`;
 
             });
 

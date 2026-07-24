@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 
+from app.routers.shuffle import import_workflow
+
 from app.models.database import SessionLocal
 from app.models.playbook_db import Playbook
+
+from app.schemas.playbook import RejectRequest
 
 router = APIRouter(prefix="/playbooks", tags=["playbooks"])
 
@@ -41,17 +45,26 @@ def approve_playbook(alert_id: str):
 
         playbook.status = "approved"
 
+        try:
+            import_workflow(playbook.id)
+            playbook.import_status = "imported"
+        except Exception:
+            playbook.import_status = "failed"
+            raise
         db.commit()
 
         return{
-            "message": "Playbook approved successfully.",
+            "message": "Playbook approved and imported successfully.",
             "status": playbook.status
         }
     finally:
         db.close()
 
 @router.post("/{alert_id}/reject")
-def reject_playbook(alert_id: str):
+def reject_playbook(
+    alert_id: str,
+    request: RejectRequest
+    ):
 
     db = SessionLocal()
 
@@ -69,10 +82,16 @@ def reject_playbook(alert_id: str):
             )
         playbook.status = "rejected"
 
+        print("==========")
+        print("Reason:", request.reason)
+        print("==========")
+
+        playbook.rejection_reason = request.reason
+
         db.commit()
 
         return {
-            "massage": "Playbook rejected.",
+            "message": "Playbook rejected.",
             "status": playbook.status
         }
 

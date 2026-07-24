@@ -13,5 +13,6 @@ class Playbook(Base):
     playbook_json = Column(Text, nullable=False)
 
     status = Column(String, default="pending")
+    rejection_reason = Column(Text, nullable=True)
     
 
