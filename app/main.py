@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from app.models.alert import Alert
 from app.models.playbook import Playbook
 from app.models.playbook_db import Playbook
+from app.routers import dashboard
 
 app = FastAPI(title="Alert Webhook API")
 
@@ -19,6 +20,7 @@ app.include_router(webhook.router)
 app.include_router(techniques.router)
 app.include_router(shuffle.router)
 app.include_router(playbook.router)
+app.include_router(dashboard.router)
 
 app.mount(
     "/static",
