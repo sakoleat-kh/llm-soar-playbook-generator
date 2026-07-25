@@ -6,6 +6,7 @@ import requests
 from app.models.database import SessionLocal
 from app.models.playbook_db import Playbook
 
+from app.utils.logger import logger
 
 router = APIRouter(prefix="/shuffle", tags=["shuffle"])
 
@@ -64,7 +65,18 @@ def import_workflow(playbook_id: str):
             status_code=response.status_code,
             detail=response.text,
         )
-
+    logger.info(
+        "shuffle_import_started",
+        extra={
+            "playbook_id": playbook_id
+        }
+    )
+    logger.info(
+        "shuffle_import_success",
+        extra={
+            "playbook_id": playbook_id
+        }
+    )
     return {
         "message": "Workflow imported successfully."
     }

@@ -8,6 +8,8 @@ from app.models.playbook_db import Playbook
 
 from app.schemas.playbook import RejectRequest
 
+from app.utils.logger import logger
+
 router = APIRouter(prefix="/playbooks", tags=["playbooks"])
 
 @router.get("/{alert_id}")
@@ -53,6 +55,13 @@ def approve_playbook(alert_id: str):
             raise
         db.commit()
 
+        logger.info(
+            "playbook_approved",
+            extra={
+                "alert_id": alert_id
+            }
+        )
+
         return{
             "message": "Playbook approved and imported successfully.",
             "status": playbook.status
@@ -89,6 +98,14 @@ def reject_playbook(
         playbook.rejection_reason = request.reason
 
         db.commit()
+
+        logger.info(
+            "playbook_rejected",
+            extra={
+                "alert_id": alert_id,
+                "reason": request.reason
+            }
+        )
 
         return {
             "message": "Playbook rejected.",

@@ -10,7 +10,8 @@ from pydantic import BaseModel, Field
 from langchain_core.exceptions import OutputParserException
 from app.services.chroma_service import search_techniques
 
-logger = logging.getLogger(__name__)
+from app.utils.logger import logger
+
 
 MAX_RETRIES = 3
 BACKOFF = [2, 4, 8]
@@ -190,9 +191,17 @@ def _invoke_with_retry(alert_text: str, candidates: str):
 
             raise
 
-        except (ConnectionError, httpx.ConnectError):
+        except (ConnectionError, httpx.ConnectError) as e:
 
-            logger.exception("Cannot connect to Ollama.")
+            logger.error(
+                "ollama_failed",
+                extra={ 
+                    "error": str(e)
+                }
+            )
+            logger.info(
+                "fallback_classifier_used"
+            )
 
             return TechniqueResult(
                 technique_id="ERROR",
@@ -303,6 +312,8 @@ def classify_alert(alert_text: str) -> TechniqueResult:
             confidence=max(result.confidence, 0.5),
             path="fallback"
         )
+
+
     
     result.path = "llm"
     return result

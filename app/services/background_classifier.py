@@ -9,6 +9,7 @@ from app.services.classifier import classify_alert
 from app.services.playbook import generate_playbook
 from app.services.renderer import render_shuffle_workflow
 
+from app.utils.logger import logger
 
 def classify_alert_background(alert_id: str):
 
@@ -27,10 +28,28 @@ def classify_alert_background(alert_id: str):
             print("Alert not found")
             return
 
+
         print("Alert loaded")
 
         print("Running classifier...")
+
+        logger.info(
+            "classification_started",
+            extra={
+                "alert_id": alert.id
+            }
+        )
         result = classify_alert(alert.normalised_json)
+
+        logger.info(
+            "alert_classified",
+            extra={
+                "alert_id": alert.id,
+                "technique_id": result.technique_id,
+                "confidence": result.confidence,
+                "path": result.path
+            }
+        )
 
         if result.path == "error":
             alert.status = "classification_failed"

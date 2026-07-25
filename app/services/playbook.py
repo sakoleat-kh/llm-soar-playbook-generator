@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from app.services.sigma_service import get_sigma_rules
 
+from app.utils.logger import logger
 
 from pydantic import BaseModel
 from typing import List
@@ -13,6 +14,13 @@ def generate_playbook(technique_id: str, technique_name: str, alert_summary: str
 
     print("===== SIGMA RULES =====")
     print(sigma_rules)
+    logger.info(
+    "playbook_generated",
+    extra={
+        "technique_id": technique_id,
+        "alert_id": alert_summary,
+    }
+    )
     return PlaybookDraft(
         technique_id=technique_id,
         technique_name=technique_name,

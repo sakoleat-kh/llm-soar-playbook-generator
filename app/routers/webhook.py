@@ -6,6 +6,8 @@ from app.models.alert import Alert
 from app.services.normaliser import normalise_alert
 from app.services.sigma import AlertInput
 from app.services.background_classifier import classify_alert_background
+from app.utils.logger import logger
+
 
 router = APIRouter()
 
@@ -57,6 +59,14 @@ def recive_alert(
     db.add(db_alert)
     db.commit()
     db.refresh(db_alert)
+
+    logger.info(
+        "alert_received",
+        extra={
+            "alert_id": db_alert.id,
+            "path": "webhook"
+        }
+    )
 
     background_tasks.add_task(
         classify_alert_background,
