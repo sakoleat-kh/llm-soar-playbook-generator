@@ -7,17 +7,41 @@ from langchain_ollama import ChatOllama
 from app.services.enrichment import get_technique_detail
 
 class PlaybookStep(BaseModel):
-    step_num : int
-    step_name : str
-    action : str
-    command_or_tool : str
-    expected_outcome : str
+    step_num : int = Field(
+        description="Step number in the plybook",
+        examples=[1]
+    )
+    step_name : str = Field(
+        description="Name of the response step",
+        examples=["Contain the Threat"]
+    )
+    action : str = Field(
+        description="Action to perform",
+        examples=["Isolate the affected host from the network."]
+    )
+    command_or_tool : str = Field(
+        description="Tool or command used to perform the action",
+        examples=["EDR"]
+    )
+    expected_outcome : str = Field(
+        description="Expected result after completing the action",
+        examples=["Host is isolated."]
+    )
 
 class PlaybookDraft(BaseModel):
-    technique_id : str
-    technique_name : str
-    alert_summary : str
-    steps: List[PlaybookStep] = Field(min_length=5, max_length=5)
+    technique_id : str = Field(
+        description="MITRE ATT&CK technique ID",
+        examples=["T1059"]
+    )
+    technique_name : str = Field(
+        description="MITRE ATT&CK technique name",
+        examples=["Command and Scripting Interpreter"]
+    )
+    alert_summary : str = Field(
+        description="Summary of the security alert",
+        examples=["PowerShell executed an encoded command from explorer.exe."]
+    )
+    steps: List[PlaybookStep] = Field(min_length=5, max_length=5, description="Generated incident response playbook with five response steps.")
 
 llm = ChatOllama(
     model="qwen2.5:3b",

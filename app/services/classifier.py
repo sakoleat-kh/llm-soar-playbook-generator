@@ -20,13 +20,14 @@ CONFIDENCE_THRESHOLD = 0.5
 class TechniqueResult(BaseModel):
     """Predicted MITRE ATT&CK technique."""
 
-    technique_id: str = Field(..., description="MITRE ATT&CK Technique ID")
+    technique_id: str = Field(..., description="MITRE ATT&CK Technique ID", examples=["T1059"])
     technique_name: str = Field(..., description="MITRE ATT&CK Technique Name")
     confidence: float = Field(
         ...,
         ge=0.0,
         le=1.0,
-        description="Confidence score"
+        description="Confidence score",
+        examples=[0.95]
     )
     path: Literal["llm", "fallback", "error"] = "llm"
     error: str | None = None

@@ -12,7 +12,17 @@ from app.utils.logger import logger
 
 router = APIRouter(prefix="/playbooks", tags=["playbooks"])
 
-@router.get("/{alert_id}")
+@router.get(
+    "/{alert_id}",
+    summary="Get Playbook",
+    description="Returns the generated playbook for the specified alert.",
+    response_description="The generated playbook.",
+    responses={
+        404: {
+            "description": "Playbook not found"
+        }
+    }
+    )
 def get_playbook(alert_id: str):
 
     db = SessionLocal()
@@ -31,7 +41,20 @@ def get_playbook(alert_id: str):
 
     return playbook
 
-@router.post("/{alert_id}/approve")
+@router.post(
+    "/{alert_id}/approve",
+    summary="Approve Playbook",
+    description="Approves a generated playbook and import and it into Shuffle.",
+    response_description="Approval result.",
+    responses={
+        404: {
+            "description": "Playbook not found"
+        },
+        503: {
+            "description": "Shuffle import failed"
+        }
+    }
+    )
 def approve_playbook(alert_id: str):
     db = SessionLocal()
 
@@ -69,7 +92,17 @@ def approve_playbook(alert_id: str):
     finally:
         db.close()
 
-@router.post("/{alert_id}/reject")
+@router.post(
+    "/{alert_id}/reject",
+    summary="Reject Playbook",
+    description="Rejects a generated playbook and stores the rejection reason.",
+    response_description="Rejection result.",
+    responses={
+        404: {
+            "description": "Playbook not found"
+        },
+    }
+)
 def reject_playbook(
     alert_id: str,
     request: RejectRequest

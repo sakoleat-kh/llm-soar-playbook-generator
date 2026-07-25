@@ -1,17 +1,41 @@
 import re
 from datetime import datetime, UTC
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.services.sigma import AlertInput
 
 class NormalisedAlert(BaseModel):
-    sender: str
-    subject: str
-    body_text: str
-    source_system: str
-    alert_type: str
-    iocs: list[str]
-    severity_level: str
-    timestamp: datetime
+    sender: str = Field (
+        description="Email address or sender of the seciruty alert",
+        examples=["analyst@example.com"]
+    )
+    subject: str = Field(
+        description="Subject or title of the security alert",
+        examples=["Suspicious PowerShell Activity"]
+    )
+    body_text: str = Field(
+        description="Normalized alert description",
+        examples=["Encoded PowerShell command executed from explorer.exe."]
+    )
+    source_system: str = Field(
+        description="System that generated the alert",
+        examples=["Microsoft Sentinel"]
+    )
+    alert_type: str = Field(
+        description="Type of security alert",
+        examples=["Malware Detection"]
+    )
+    iocs: list[str] = Field(
+        description="List of extracted Indicators of Compromise (IOCs)",
+        examples=[["explorer.exe", "powershell.exe."]]
+    )
+    severity_level: str = Field(
+        description="Normalized severity level",
+        examples=["medium"]
+    )
+    timestamp: datetime = Field(
+        description="Timestamp when the alert waas generated",
+        examples=["2026-27-26T12:30:00Z"]
+    )
 
 IP_REGEX = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
 DOMAIN_REGEX = r"\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b"

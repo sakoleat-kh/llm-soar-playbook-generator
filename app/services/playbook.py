@@ -5,7 +5,7 @@ from app.services.sigma_service import get_sigma_rules
 
 from app.utils.logger import logger
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 
@@ -66,22 +66,58 @@ def generate_playbook(technique_id: str, technique_name: str, alert_summary: str
     )
 
 class SigmaRule(BaseModel):
-    title: str
+    title: str = Field(
+        description="URL of the Sigma rule in the SigmaHQ repository",
+        examples=[
+            "https://raw.githubusercontent.com/SigmaHQ/sigma/main/rules/windows/proc_creation_win_cscript_vbs.yml"
+        ]
+    )
     raw_url: str
 
 class PlaybookStep(BaseModel):
-    step_num: int
-    step_name: str
-    action: str
-    command_or_tool: str
-    expected_outcome: str
+    step_num: int = Field(
+        description="Step number in the response playbook",
+        examples=[1]
+    )
+    step_name: str = Field(
+        description="Name of the response step",
+        examples=["Contain the Threat"]
+    )
+    action: str = Field(
+        description="Action to be performed",
+        examples=["Isolate the affected host from the network."]
+    )
+    command_or_tool: str = Field(
+        description="Tool or command used to perform the action",
+        examples=["EDR"]
+    )
+    expected_outcome: str = Field(
+        description="Expected result after the step is completed",
+        examples=["Hostis isolated"]
+    )
 
 class PlaybookDraft(BaseModel):
-    technique_id: str
-    technique_name: str
-    alert_summary: str
-    steps: List[PlaybookStep]
-    sigma_rules: List[SigmaRule] = []
+    technique_id: str = Field(
+        description="MITRE ATT&CK technique ID",
+        examples=["T1059"]
+    )
+    technique_name: str = Field(
+        description="MITRE ATT&CK name",
+        examples=["Command and Scripting Interpreter"]
+    )
+    alert_summary: str = Field(
+        description="Summary of the classified security alert",
+        examples=[
+            "PowerShell executed an encoded command from explorer.exe."
+        ]
+    )
+    steps: List[PlaybookStep] = Field(
+        description="List of generated response steps"
+    )
+    sigma_rules: List[SigmaRule] = Field(
+        default_factory=list,
+        description="Related Sigma detection rules"
+    )
 
 
 

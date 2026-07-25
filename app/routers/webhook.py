@@ -12,7 +12,13 @@ from app.utils.logger import logger
 router = APIRouter()
 
 
-@router.post("/webhook/alert")
+@router.post(
+    "/webhook/alert",
+    summary="Receive Security Alert",
+    description="Received a security alert, normalizes it, stores it in the database, and start background classification.",
+    response_description="Returns the generated alert ID."
+
+    )
 def recive_alert(
     alert: AlertInput,
     background_tasks: BackgroundTasks,
@@ -79,7 +85,13 @@ def recive_alert(
         "alert_id": db_alert.id
     }
     
-@router.get("/alerts")
+@router.get(
+    "/alerts",
+    summary="List Alert",
+    description="Returns the latest alerts stored in the database.",
+    response_description="A list of alerts."
+
+    )
 def list_alerts(
     skip: int = 0,
     limit: int = 20,
