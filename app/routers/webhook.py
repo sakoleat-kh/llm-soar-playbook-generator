@@ -16,6 +16,34 @@ def recive_alert(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
+    if not alert.body_text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="body_text cannot be empty."
+        )
+
+    MAX_ALERT_SIZE = 5000
+
+    print(f"Alert lenght = {len(alert.body_text)}")
+
+    if len(alert.body_text) > MAX_ALERT_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="Alert exceeds maximun length."
+        )
+
+    existing = (
+        db.query(Alert)
+        .filter(Alert.raw_json == alert.model_dump_json())
+        .first()
+    )
+
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail="Duplicate alert."
+        )
+    
     # Normalise the incoming alert
     normalised_alert = normalise_alert(alert)
 

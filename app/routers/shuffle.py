@@ -1,3 +1,6 @@
+import os
+
+
 from fastapi import APIRouter, HTTPException
 import requests
 from app.models.database import SessionLocal
@@ -7,7 +10,8 @@ from app.models.playbook_db import Playbook
 router = APIRouter(prefix="/shuffle", tags=["shuffle"])
 
 SHUFFLE_URL = "http://localhost:3443/api/v1/workflows"
-SHUFFLE_API_KEY = "Your API KEY"
+SHUFFLE_API_KEY = os.getenv("GITHUB_TOKEN")
+
 
 @router.post("/import/{playbook_id}")
 def import_workflow(playbook_id: str):

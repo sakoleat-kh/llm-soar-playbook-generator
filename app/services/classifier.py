@@ -1,5 +1,7 @@
 import logging
 import time
+import httpx
+
 from typing import Literal
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -188,7 +190,7 @@ def _invoke_with_retry(alert_text: str, candidates: str):
 
             raise
 
-        except ConnectionError:
+        except (ConnectionError, httpx.ConnectError):
 
             logger.exception("Cannot connect to Ollama.")
 

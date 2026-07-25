@@ -32,6 +32,15 @@ def classify_alert_background(alert_id: str):
         print("Running classifier...")
         result = classify_alert(alert.normalised_json)
 
+        if result.path == "error":
+            alert.status = "classification_failed"
+
+            db.commit()
+
+            print("classification failed because Ollama is unavailable.")
+
+            return
+
         print("Classifier finished")
         print(result)
 
