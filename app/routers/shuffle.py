@@ -10,20 +10,22 @@ from app.utils.logger import logger
 
 router = APIRouter(prefix="/shuffle", tags=["shuffle"])
 
-SHUFFLE_URL = "http://localhost:3443/api/v1/workflows"
-SHUFFLE_API_KEY = os.getenv("GITHUB_TOKEN")
+SHUFFLE_URL = "https://localhost:3443/api/v1/workflows"
+api_key = os.getenv("SHUFFLE_API_KEY")
 
 
 @router.post("/import/{playbook_id}")
 def import_workflow(playbook_id: str):
     db = SessionLocal()
 
-    playbook = (
-        db.query(Playbook)
-        .filter(Playbook.id == playbook_id)
-        .first()
+    try:
+        playbook = (
+            db.query(Playbook)
+            .filter(Playbook.id == playbook_id)
+            .first()
     )
-    print(playbook)
+    finally:
+        db.close()
 
     if not playbook:
         raise HTTPException(
@@ -33,7 +35,7 @@ def import_workflow(playbook_id: str):
         )
 
     headers = {
-        "Authorization": f"Bearer {SHUFFLE_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
 
@@ -42,6 +44,7 @@ def import_workflow(playbook_id: str):
             SHUFFLE_URL,
             headers=headers,
             data=playbook.playbook_json,
+            verify=False,
             timeout=30,
         )
     except requests.exceptions.ConnectionError:
@@ -55,11 +58,14 @@ def import_workflow(playbook_id: str):
             status_code=401,
             detail="Shuffle authentication failed."
         )
+
     if response.status_code == 409:
         raise HTTPException(
             status_code=409,
             detail="Workflow already exists."
         )
+
+    
     if not response.ok:
         raise HTTPException(
             status_code=response.status_code,

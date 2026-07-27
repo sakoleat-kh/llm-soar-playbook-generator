@@ -1,45 +1,80 @@
-from attackcti import attack_client
+import json
+from pathlib import Path
+
 from sqlalchemy.orm import Session
 
 from app.models.database import Base, SessionLocal, engine
 from app.models.technique import Technique
 
-# Ensure the table exits 
 Base.metadata.create_all(bind=engine)
 
 def load_all_techniques():
-    client = attack_client()
-    techniques = client.get_techniques()
+    json_file = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "enterprise-attack.json"
+    )
+
+    print(json_file)
+    print(json_file.exists())
+
+    with open(json_file, "r", encoding="utf-8") as f:
+        attack_data = json.load(f)
+
+    print("Objects:", len(attack_data["objects"]))
 
     db: Session = SessionLocal()
 
     try:
-        for tech in techniques:
-            technique_id = tech.get("external_references", [{}])[0].get("external_id")
-            if not technique_id:
+        count = 0
+
+        for obj in attack_data["objects"]:
+
+            if obj.get("type") != "attack-pattern":
                 continue
+
+            if obj.get("revoked", False):
+                continue
+
+            technique_id = None
+
+            for ref in obj.get("external_references", []):
+
+                if ref.get("source_name") == "mitre-attack":
+                    technique_id = ref.get("external_id")
+                    break
+
+            if technique_id is None:
+                continue
+
             existing = db.get(Technique, technique_id)
+
             if existing:
                 continue
 
             tactics = [
                 phase.get("phase_name")
-                for phase in tech.get("kill_chain_phases", [])
-            ]
-            data_sources = tech.get("x_mitre_data_sources", [])
+                for phase in obj.get("kill_chain_phases", [])
+                ]
 
             technique = Technique(
-                technique_id=technique_id,
-                name=tech.get("name", ""),
-                description=tech.get("description", ""),
-                tactics=tactics,
-                data_sources=data_sources,
-            )
+                    technique_id=technique_id,
+                    name=obj.get("name", ""),
+                    description=obj.get("description", ""),
+                    tactics=tactics,
+                    data_sources=obj.get(
+                        "x_mitre_data_sources",
+                        [],
+                    ),
+                )
 
             db.add(technique)
+            print(technique_id, obj.get("name"))
+            count += 1
 
         db.commit()
-        print("MITRE ATT&CK techniques loaded successfully.")
+
+        print(f"Loaded {count} techniques.")
 
     finally:
         db.close()

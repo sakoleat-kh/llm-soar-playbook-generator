@@ -12,8 +12,6 @@ from typing import List
 def generate_playbook(technique_id: str, technique_name: str, alert_summary: str) -> PlaybookDraft:
     sigma_rules = get_sigma_rules(technique_id)
 
-    print("===== SIGMA RULES =====")
-    print(sigma_rules)
     logger.info(
     "playbook_generated",
     extra={

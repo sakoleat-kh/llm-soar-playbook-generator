@@ -8,6 +8,7 @@ load_dotenv()
 GITHUB_API = "https://api.github.com"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
+
 def _headers():
     headers = {
         "Accept": "application/vnd.github+json",
@@ -20,7 +21,8 @@ def _headers():
 def get_sigma_rules(technique_id: str) -> List[dict]:
     query = f"{technique_id} repo:SigmaHQ/sigma"
 
-    response = requests.get(
+    try:
+        response = requests.get(
         f"{GITHUB_API}/search/code",
         params={
             "q": query,
@@ -29,6 +31,8 @@ def get_sigma_rules(technique_id: str) -> List[dict]:
         headers=_headers(),
         timeout=30,
     )
+    except requests.exceptions.RequestException as e:
+        raise
 
     if response.status_code == 403:
         remaining = response.headers.get("X-RateLimit-Remaining")

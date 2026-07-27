@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from fastapi import FastAPI
 from app.routers import webhook, techniques, shuffle, playbook
 from app.models.database import Base, engine
