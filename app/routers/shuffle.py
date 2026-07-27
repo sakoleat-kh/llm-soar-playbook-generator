@@ -16,6 +16,12 @@ api_key = os.getenv("SHUFFLE_API_KEY")
 
 @router.post("/import/{playbook_id}")
 def import_workflow(playbook_id: str):
+
+    """
+    Import an approved playbook into the local
+    Shuffle automation platform.
+    """
+
     db = SessionLocal()
 
     try:
