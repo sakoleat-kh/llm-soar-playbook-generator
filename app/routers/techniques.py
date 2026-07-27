@@ -6,6 +6,12 @@ router = APIRouter(prefix="/techniques", tags=["Techniques"])
 
 @router.get("/{technique_id}")
 def technique_detail(technique_id: str):
+
+    """
+    Return detailed information about a MITRE ATT&CK 
+    technique from the local database.
+    """
+
     technique = get_technique_detail(technique_id)
 
     if technique is None:

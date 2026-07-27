@@ -25,6 +25,11 @@ router = APIRouter(prefix="/playbooks", tags=["playbooks"])
     )
 def get_playbook(alert_id: str):
 
+    """
+    Retrieve the generated playbook associated with 
+    the specified alert.
+    """
+
     db = SessionLocal()
 
     playbook = (
@@ -56,6 +61,12 @@ def get_playbook(alert_id: str):
     }
     )
 def approve_playbook(alert_id: str):
+
+    """
+    Approve a generated playbook, import it into Shuffle,
+    and update its approval status.
+    """
+
     db = SessionLocal()
 
     try:
@@ -107,6 +118,11 @@ def reject_playbook(
     alert_id: str,
     request: RejectRequest
     ):
+
+    """
+    Reject a generated playbook and store the 
+    analyst's rejection reason.
+    """
 
     db = SessionLocal()
 

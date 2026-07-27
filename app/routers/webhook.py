@@ -19,11 +19,17 @@ router = APIRouter()
     response_description="Returns the generated alert ID."
 
     )
-def recive_alert(
+def receive_alert(
     alert: AlertInput,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
+
+    """
+    Receive a security alert, normalize it, store it,
+    and start background classification.
+    """
+    
     if not alert.body_text.strip():
         raise HTTPException(
             status_code=400,
@@ -97,6 +103,11 @@ def list_alerts(
     limit: int = 20,
     db: Session = Depends(get_db)
 ):
+
+    """
+    Return the most recent alerts stored in the database.
+    """
+    
     limit = min(limit, 100)
 
     alerts = (
@@ -113,6 +124,11 @@ def get_alert(
     alert_id: str,
     db: Session = Depends(get_db),
 ):
+
+    """
+    Return a single alert using its unique identifier.
+    """
+    
     alert = (
         db.query(Alert)
         .filter(Alert.id == alert_id)

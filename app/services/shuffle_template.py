@@ -16,6 +16,12 @@ def render_shuffle_workflow(
         draft: PlaybookDraft,
         alert_id: str,
 ) -> str:
+
+    """
+    Render the Shuffle workflow template using the supplied playbook
+    draft and alert identifier.
+    """
+    
     return template.render(
         draft=draft,
         alert_id=alert_id,

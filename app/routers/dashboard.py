@@ -14,6 +14,11 @@ router = APIRouter()
 @router.get("/dashboard")
 def dashboard(db: Session = Depends(get_db)):
 
+    """
+    Return the latest alerts with their classification results,
+    playbook status, and dashboard summary information.
+    """
+
     alerts = (
         db.query(Alert)
         .order_by(desc(Alert.created_at))

@@ -41,6 +41,12 @@ IP_REGEX = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
 DOMAIN_REGEX = r"\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b"
 
 def determine_alert_type(subject: str) -> str:
+
+    """
+    Determine the alert category based on keywords found in
+    the alert subject.
+    """
+
     subject_lower = subject.lower()
 
     if "login" in subject_lower:
@@ -52,6 +58,11 @@ def determine_alert_type(subject: str) -> str:
     return "unknown"
 
 def determine_severity_level(severity: int) -> str:
+
+    """
+    Convert a numeric severity score into a normalized severity level.
+    """
+
     if severity >= 8:
         return "high"
     elif severity >= 4:
@@ -59,12 +70,23 @@ def determine_severity_level(severity: int) -> str:
     return "low"
 
 def extract_iocs(text: str) -> list[str]:
+
+    """
+    Extract IP addresses and domain names from alert text.
+    """
+
     ips = re.findall(IP_REGEX, text)
     domains = re.findall(DOMAIN_REGEX, text)
 
     return list(set(ips + domains))
 
 def normalise_alert(raw: AlertInput) -> NormalisedAlert:
+
+    """
+    Normalize a raw security alert into the standard alert format
+    used by the application.
+    """
+
     combined_text = f"{raw.subject} {raw.body_text}"
 
     return NormalisedAlert(

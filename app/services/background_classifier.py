@@ -13,6 +13,11 @@ from app.utils.logger import logger
 
 def classify_alert_background(alert_id: str):
 
+    """
+    Classify an alert, generate a response playbook, render a Shuffle
+    workflow, and store the results asynchronously.
+    """
+
     db = SessionLocal()
 
     try:

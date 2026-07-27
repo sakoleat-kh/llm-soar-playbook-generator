@@ -10,6 +10,11 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def _headers():
+
+    """
+    Build the HTTP headers required for GitHub API requests.
+    """
+
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "attack-enrichment-service",
@@ -19,6 +24,12 @@ def _headers():
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
     return headers
 def get_sigma_rules(technique_id: str) -> List[dict]:
+
+    """
+    Retrieve Sigma detection rules related to the specitied
+    MITRE ATT&CK technique from GitHub.
+    """
+
     query = f"{technique_id} repo:SigmaHQ/sigma"
 
     try:

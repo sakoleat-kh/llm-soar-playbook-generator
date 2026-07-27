@@ -5,6 +5,12 @@ from app.models.database import SessionLocal
 from app.models.technique import Technique
 
 def get_technique_detail(technique_id: str) -> Optional[dict]:
+
+    """
+    Retrieve detailed information for a MITRE ATT&CK technique,
+    including its related sub-techniques.
+    """
+
     db: Session = SessionLocal()
 
     try: 

@@ -15,6 +15,10 @@ collection =client.get_or_create_collection(
 )
 
 def build_attack_index():
+    """
+    Build or rebuild the ChromaDB vector index using all MITRE ATT&CK
+    techniques stored in the local database.
+    """
     db = SessionLocal()
 
     try:
@@ -66,6 +70,12 @@ def build_attack_index():
         db.close()
 
 def search_techniques(query: str, n_results: int =5 ) -> list:
+
+    """
+    Search the ChromaDB index for ATT&CK techniques that are most
+    relevant to the supplied alert text.
+    """
+
     results = collection.query(
         query_texts=[query],
         n_results=n_results,

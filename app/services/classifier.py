@@ -125,6 +125,11 @@ llm = ChatOllama(
 chain = prompt | llm.with_structured_output(TechniqueResult)
 
 def _invoke_chain(alert_text: str, candidates: str, system_prompt: str = SYSTEM_PROMPT):
+
+    """
+    Execute the LLm prompt and return a structured MITRE ATT&CK
+    classification result.
+    """
     
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -154,6 +159,12 @@ Relevant ATT&CK Techniques:
     )
 
 def _invoke_with_retry(alert_text: str, candidates: str):
+
+    """
+    Execute the classifier with automatic retry logic and simplified
+    prompts if structured output parsing fails.
+    """
+
     simplified = False
 
     for attempt in range(MAX_RETRIES):

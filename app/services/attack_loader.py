@@ -9,6 +9,12 @@ from app.models.technique import Technique
 Base.metadata.create_all(bind=engine)
 
 def load_all_techniques():
+
+    """
+    Load MITRE ATT&CK techniques from the Enterprise ATT&CK JSON file
+    into the local database, skipping revoked and existing techniques.
+    """
+
     json_file = (
         Path(__file__).resolve().parents[2]
         / "data"

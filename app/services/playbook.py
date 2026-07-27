@@ -10,6 +10,12 @@ from typing import List
 
 
 def generate_playbook(technique_id: str, technique_name: str, alert_summary: str) -> PlaybookDraft:
+
+    """
+    Generate a structured incident response playbook using the 
+    classified ATT&CK technique and related Sigma rules.
+    """
+
     sigma_rules = get_sigma_rules(technique_id)
 
     logger.info(
