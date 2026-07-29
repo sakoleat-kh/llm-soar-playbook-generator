@@ -21,11 +21,11 @@ class PlaybookStep(BaseModel):
     )
     command_or_tool : str = Field(
         description="Tool or command used to perform the action",
-        examples=["EDR"]
+        examples=["Microsoft Defender"]
     )
     expected_outcome : str = Field(
         description="Expected result after completing the action",
-        examples=["Host is isolated."]
+        examples=["Host is isolated from the network."]
     )
 
 class PlaybookDraft(BaseModel):
@@ -54,7 +54,7 @@ SYSTEM_PROMT = """
 
 You are a senior SOC incident responder.
 
-Generate a 5-step incident response playbook in JSOn.
+Generate an incident response playbook as VALID JSOn.
 
 ATT&CK  Technique:
 {technique_id}: {technique_name}
@@ -65,19 +65,38 @@ Technique Description:
 Alert:
 {alert_summary}
 
-Rules:
+Requiremnets:
 - Return ONLY valid JSON.
-- Produce exactly 5 steps.
-- Each step must contain:
+- Produce EXACTLY 5 incident response steps.
+- Every step MUST be different.
+- Never repeat the same action.
+- Never output placeholder text.
+- Never output "Repeats the call parameter".
+
+Each step must contain:
     - step_num
     - step_name
     - action
     - command_or_tool
     - expected_outcome
-- Steps must be specific, practical, and actionable.
-- Use realistic SOC tools where appropriate (Microsoft Defender, CrowdStrike,
-splunk, Velociraptor, PowerShell, Windows Event Viewer, etc.).
 
+The five steps should roughly cover:
+1. Containment
+2. Evidence Collection
+3. Investigation
+4. Reediation
+5. Recovery
+
+USe realistic SOC tools whenever appropriate, for example:
+- Microsoft Defender
+- CrowdStrike
+- Velociraptor
+- Sysmon
+- Windows Event Viewer
+- PowerShell
+- Splunk
+
+Return JSON only.
 """
 
 def generate_playbook(
@@ -85,7 +104,7 @@ def generate_playbook(
     alert: str,
 ) -> PlaybookDraft:
     """
-    Generate an incident response playbook for the classified ATT&CK technique.
+    Generate an incident response playbook for a classified ATT&CK technique.
     """
 
     technique = get_technique_detail(technique_id)
@@ -108,3 +127,23 @@ def generate_playbook(
             "alert_summary": alert,
         }
     )
+
+    print("\n========================")
+    print("Generated Playbook")
+    print("==========================")
+
+    print(result)
+
+    print("\nPlaybook Steps")
+
+    for step in result.steps:
+        print("-----------------------------")
+        print(f"Step {step.step_nu}")
+        print(f"Name : {step.action}")
+        print(f"Action : {step.action}")
+        print(f"Tool : {step.command_or_tool}")
+        print(f"Outcome: {step.expected_outcome}")
+
+    print("============================================\n")
+
+    return result
