@@ -1,4 +1,5 @@
 import json
+import time
 
 from pathlib import Path
 from sklearn.metrics import (accuracy_score, precision_recall_fscore_support)
@@ -18,11 +19,20 @@ def evaluate(alerts, dataset_name):
     true_labels = []
     predicted_labels = []
     predictions = []
+    latencies = []
 
     print(f"\n===== {dataset_name.upper()} =====")
 
     for alert in alerts:
+
+        start = time.perf_counter()
+
         result = classify_alert(alert["text"])
+
+        end = time.perf_counter()
+
+        latency_ms = (end - start) * 1000
+        latencies.append(latency_ms)
 
         predicted = result.technique_id
         expected = alert["technique_id"]
@@ -65,12 +75,16 @@ def evaluate(alerts, dataset_name):
     print(f"Recall   : {recall:.4f}")
     print(f"F1 Score : {f1:.4f}")
 
+    average_latency = sum(latencies) / len(latencies)
+    print(f"Average Latency: {average_latency:.2f} ms")
+
     return {
          "num_alerts": len(alerts),
          "accuracy": accuracy,
          "precision": precision,
          "recall": recall,
          "f1": f1,
+         "average_latency_ms": average_latency,
          "predictions": predictions,
     }
 
@@ -131,19 +145,22 @@ def main ():
 
     results = {
             "dataset": "official_test",
+
             "train": {
                 "num_alerts": train_results["num_alerts"],
                 "accuracy": train_results["accuracy"],
                 "precision": train_results["precision"],
                 "recall": train_results["recall"],
                 "f1": train_results["f1"],
+                "average_latency_ms": train_results["average_latency_ms"],
             },
             "test": {
                 "num_alerts": test_results["num_alerts"],
                 "accuracy": test_results["accuracy"],
                 "precision": test_results["precision"],
                 "recall": test_results["recall"],
-                "f1": test_results["f1"]
+                "f1": test_results["f1"],
+                "average_latency_ms": test_results["average_latency_ms"],
             },
             "gap": gap,
             "predictions": test_results["predictions"],

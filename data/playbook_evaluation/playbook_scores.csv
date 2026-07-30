@@ -1,0 +1,16 @@
+Alert ID,Technique,Completeness,Technical Accuracy,Actionability,Average,Notes
+36,T1059,3,3,2,2.67,Placeholder text in most sections; only containment contains a concrete action.
+37,T1059,2,3,2,2.33,Only containment contains a valid action; remaining sections contain placeholder text.
+38,T1059,5,4,4,4.33,Complete IR workflow with correct response phases; recommendations are technically sound but could be more specific for T1059.
+39,T1059,5,4,4,4.33,Complete IR workflow with appropriate response phases; recommendations are technically correct but somewhat generic.
+40,T1059,5,4,4,4.33,Complete IR workflow; technically correct but recommendations are somewhat generic.
+41,T1078,5,4,4,4.33,Complete IR workflow with logical response phases; technically correct but recommendations are generic.
+42,T1078,5,3,4,4.00,Complete IR workflow but recommendations are generic; should include account-focused actions such as disabling accounts, password resets, MFA review, and authentication log analysis.
+43,T1078,5,3,4,4.00,Complete IR workflow but uses generic malware-response actions instead of account-specific actions such as disabling accounts, resetting passwords, reviewing authentication logs, and verifying MFA.
+44,T1078,5,3,4,4.00,Complete IR workflow but uses generic malware-response actions instead of account-specific actions such as disabling accounts, resetting passwords, reviewing authentication logs, revoking active sessions, and verifying MFA.
+45,T1078,5,3,4,4.00,Complete IR workflow but recommendations are generic; should focus on account compromise response (disable account, reset password, review authentication logs, revoke sessions, verify MFA). 
+46,T1078,5,3,4,4.00,Complete IR workflow but recommendations are generic; should focus on account compromise response such as disabling accounts, resetting passwords, reviewing authentication logs, revoking sessions, and verifying MFA.
+47,T1021,5,4,4,4.33,Complete IR workflow; technically correct but should include remote-service-specific actions such as reviewing RDP/SSH logs, terminating remote sessions, disabling remote access, and auditing VPN activity. 
+48,T1021,5,4,4,4.33,Complete IR workflow; technically correct but should include remote-service-specific actions such as reviewing RDP/SSH logs, terminating remote sessions, disabling remote access, and auditing VPN activity.
+49,T1021,5,4,4,4.33,Complete IR workflow; technically correct but should include remote-service-specific actions such as reviewing RDP/SSH logs, terminating remote sessions, disabling remote access, and auditing VPN activity.
+50,T1021,5,4,4,4.33,Complete IR workflow; technically correct but should include remote-service-specific actions such as reviewing RDP/SSH logs, terminating remote sessions, auditing VPN activity, and disabling unnecessary remote services.
